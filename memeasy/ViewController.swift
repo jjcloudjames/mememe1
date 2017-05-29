@@ -6,10 +6,8 @@
 //  Copyright © 2017 James Wolke. All rights reserved.
 
 //  excercise meme lesson 4: v1.0 mememe application.
-//  programs runs, no errors. Runs on portrait iphone 6s.
-//  suggested improvements: aspect ratio to iphone full screen.
-//     keyboard return after text input.
-//     share button location and hidden attributes
+//  programs runs, no errors. Runs on portrait or landscape iphone 6s.
+//  xcode 8.0 Swift 3.0
 
 import UIKit
 
@@ -23,13 +21,15 @@ UINavigationControllerDelegate, UITextFieldDelegate {
     @IBOutlet weak var textTop: UITextField!
     @IBOutlet weak var textBottom: UITextField!
 
+    @IBOutlet weak var cameraButton: UIBarButtonItem!
+
+    @IBOutlet weak var toolbarBottom: UIToolbar!
+
     //Add outlets to control visability
-    @IBOutlet weak var toolBar: UIToolbar!
-    @IBOutlet weak var toolBar2: UIToolbar!
-    @IBOutlet weak var toolBar3: UIToolbar!
+
     
+    @IBOutlet weak var shareButton: UIBarButtonItem!
     //share button to capture memed image with text
-    @IBOutlet weak var shareButton: UIButton!
 
     struct Meme {
         var topText: String
@@ -46,48 +46,58 @@ UINavigationControllerDelegate, UITextFieldDelegate {
         NSStrokeWidthAttributeName: -4.0
                                     
     ]
-   
+    
+    
+   // set text styles, locate image, and disable share button on view did load
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
-        // define text fields alignment, style, and attributes
-        func setTextStyle(textField:UITextField) {
-            
-            textTop.text = (" Add Text ")
-            textBottom.text = (" Add Text ")
-            textTop.textAlignment = .center
-            textBottom.textAlignment = .center
-            textTop.borderStyle = UITextBorderStyle.none
-            textBottom.borderStyle = UITextBorderStyle.none
-            textTop.defaultTextAttributes = multipleAttributes
-            textBottom.defaultTextAttributes = multipleAttributes
-            textTop.delegate = self
-            textBottom.delegate = self
-            self.shareButton.isEnabled = false
-            
-        }
-
         setTextStyle(textField: textTop)
         setTextStyle(textField: textBottom)
-
+        imagePickerView.frame.origin.y = 0
+        self.shareButton.isEnabled = false
+        
     }
+    
+    
+    // define text fields alignment, style, and attributes
+    func setTextStyle(textField:UITextField) {
+        
+        textTop.text = (" Add Text ")
+        textBottom.text = (" Add Text ")
+        textTop.textAlignment = .center
+        textBottom.textAlignment = .center
+        textTop.borderStyle = UITextBorderStyle.none
+        textBottom.borderStyle = UITextBorderStyle.none
+        textTop.defaultTextAttributes = multipleAttributes
+        textBottom.defaultTextAttributes = multipleAttributes
+        textTop.delegate = self
+        textBottom.delegate = self
+        self.shareButton.isEnabled = false
+        
+    }
+
     
     // view to appear and keyboard notification setup
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         self.subscribeToKeyboardNotifications()
-
+    
     }
     
     // view disappears and closes keyboard notifications
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        //self.subscribeToKeyboardWillHideNotifications()
         self.unsubscribeFromKeyboardNotifications()
     }
     
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+    
     //Share meme button to define an instance of the activityview controller, present the activityviewcontroller
-    @IBAction func shareMemeButton(_ sender: AnyObject) {
+     @IBAction func shareMemeButton(_ sender: AnyObject) {
 
         let memedImage = self.generateMemedImage()
 
@@ -105,10 +115,9 @@ UINavigationControllerDelegate, UITextFieldDelegate {
                 print("show and tell")
             }
             else {
-                print("Bad user canceled sharing :(")
+                print("user canceled sharing :(")
             }
         }
-        
         
     }
     
@@ -131,107 +140,37 @@ UINavigationControllerDelegate, UITextFieldDelegate {
         // Create the meme
         let meme = Meme(topText: textTop.text!, bottomText: textBottom.text!, originalImage: imagePickerView.image!, memedImage: memedImage)
         
- //NOTE: I was interested in saving the meme to the document folder but error indicated cannot change image to UIImageview, please comment, or also cannot call value of non-function type viewcontroller.Meme
-  
-        
- //future consideration for saving image
-        let imageData = meme.memedImage
-        
-        let fileManager = FileManager.default
-      
-        let paths = (NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString).appendingPathComponent("customDirectory")
-        
-        if !fileManager.fileExists(atPath: paths){
-            try! fileManager.createDirectory(atPath: paths, withIntermediateDirectories: true, attributes: nil)
-        }
-        else {
-            print("Already dictionary created.")
-        }
-    
-//future consideration for saving image
-//        do {
-////            //Save image to Root
-//        try imageData(to: paths, options: .atomic)
-//
-//        print("Saved To Root")
-//
-//        } catch let error {
-//
-//            print(error)
-//
-//        }
-    
-        //restore toolbar buttons for photo album and camera
-        self.toolBar.isHidden = false
-        self.toolBar2.isHidden = false
-        self.toolBar3.isHidden = false
-
-        
     }
     
-    //no camera currently for future defintion
-    @IBAction func pickCameraImage(_ sender: Any) {
-        let device = ("cam")
-        if UIImagePickerController.isSourceTypeAvailable(.camera) {
-            let imagePicker = UIImagePickerController()
-            imagePicker.delegate = self
-            imagePicker.allowsEditing = false
-            imagePicker.sourceType = UIImagePickerControllerSourceType.camera
-            present(imagePicker, animated:  true, completion: nil)
-        }
-        else {
+     // button press for photo or camera, added message note for inoperable camera
+    @IBAction func pickAnimage(_ sender: UIBarButtonItem) {
+        let device = ("camera")
+        let cameraTag = 0
+        if (sender.tag == cameraTag) {
             noCamera(optDev: device)
+            //configureImagePicker(Type: .camera)
+        }
+        else {
+            configureImagePicker(Type: .photoLibrary)
         }
 
     }
-    // no album currently for future definition
-    @IBAction func pickAnAlbumImage(_ sender: AnyObject) {
-        let device = ("pho")
-//        if UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
-//        let imagePicker = UIImagePickerController()
-//        imagePicker.delegate = self
-//        imagePicker.allowsEditing = false
-//        imagePicker.sourceType = UIImagePickerControllerSourceType.photoLibrary
-//        present(imagePicker, animated:  true, completion: nil)
-//        }
-//        else {
-        noCamera(optDev: device)
-//        }
-    }
     
-    // photo function for pick of simulator images, currently an error on the Moments selection, only shows Wednesday Thursday, Yesterday and Today, not sure how to reset
-    @IBAction func PickAnimage(_ sender: AnyObject) {
+    //define source
+    func configureImagePicker(Type: UIImagePickerControllerSourceType){
         let imagePicker = UIImagePickerController()
+        imagePicker.sourceType = Type
         imagePicker.delegate = self
-        //imagePicker.allowsEditing = false
-        imagePicker.sourceType = .photoLibrary
-        imagePicker.mediaTypes = UIImagePickerController.availableMediaTypes(for: .photoLibrary)!
-        present(imagePicker, animated: true, completion: nil)
-        self.toolBar.isHidden = true
-        self.toolBar2.isHidden = true
-        self.toolBar3.isHidden = true
         
+        present(imagePicker, animated: true, completion: nil)
         self.shareButton.isEnabled = true
-       
+        self.toolbarBottom.isHidden = true
     }
     
-    // defines the image for selection
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
     
-        let jimage = info[UIImagePickerControllerOriginalImage] as? UIImage
-        imagePickerView.contentMode = .scaleAspectFit
-        imagePickerView.image = jimage
-        dismiss(animated: true, completion: nil)
-
-    }
-    
-    func imagePickerControllerDidCancel(_: UIImagePickerController) {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    //message function to indicated missing album and camera functionality
+    //message function to indicated missing camera functionality
     func noCamera(optDev: String){
-        if optDev == "cam" {
+        if optDev == "camera" {
             let alertVC = UIAlertController(
                 title: "No Camera",
                 message: "Sorry, this device has no camera",
@@ -261,31 +200,36 @@ UINavigationControllerDelegate, UITextFieldDelegate {
                 animated: true,
                 completion: nil)
         }
-        }
-    
+    }
 
+     // defines the image for selection
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        let jimage = info[UIImagePickerControllerOriginalImage] as? UIImage
+        imagePickerView.contentMode = .scaleAspectFit
+        imagePickerView.image = jimage
+        dismiss(animated: true, completion: nil)
+
+    }
     
-    //next functions define keyboard displacement for access to text editing.  some errors is displacement and reinstatment.  Need to idenify locations and reset capability
+    func imagePickerControllerDidCancel(_: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    
+    //next functions define keyboard displacement for access to text editing.
     func keyboardWillShow(notification:  NSNotification){
         if textBottom.isFirstResponder {
-            self.view.frame.origin.y = getKeyboardHeight(notification: notification)
-                * -1
+            self.view.frame.origin.y = getKeyboardHeight(notification: notification) * -1
         }
-        
-        //self.view.frame.origin.y -= getKeyboardHeight(notification: notification)
-        
-    }
-    
-    func keyboardWillHide(notification: NSNotification) {
-        
+          }
+ 
+    // shift the view back to original position
+    func keyboardWillHide(_ notification: NSNotification) {
         if textBottom.isFirstResponder {
             self.view.frame.origin.y = 0
-            
         }
-        //self.view.frame.origin.y += getKeyboardHeight(notification: notification)
-   
     }
-
+ 
     func getKeyboardHeight(notification: NSNotification) -> CGFloat {
         let userInfo = notification.userInfo
         let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as!NSValue
@@ -295,11 +239,15 @@ UINavigationControllerDelegate, UITextFieldDelegate {
     
     func subscribeToKeyboardNotifications() {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
-        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: .UIKeyboardWillHide, object: nil)
     }
     
     func unsubscribeFromKeyboardNotifications() {
-        NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillShow, object: nil) }
+        
+        NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillHide, object: nil)
+    }
+    
     
 }
 
