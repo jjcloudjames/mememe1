@@ -22,15 +22,7 @@
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translucent="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b4e-Eu-jGx" userLabel="Toolbar Bottom">
                                 <items>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="Nnq-WG-ItJ"/>
-                                    <barButtonItem style="plain" id="geJ-bP-vXd">
-                                        <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="lVr-pR-lYb">
-                                            <rect key="frame" x="57" y="7" width="112" height="30"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <state key="normal" title="Camera"/>
-                                            <connections>
-                                                <action selector="pickAnimage:" destination="BYZ-38-t0r" eventType="touchUpInside" id="grD-SO-x4v"/>
-                                            </connections>
-                                        </button>
+                                    <barButtonItem style="plain" systemItem="camera" id="geJ-bP-vXd">
                                         <connections>
                                             <action selector="pickAnimage:" destination="BYZ-38-t0r" id="ouG-BV-J4I"/>
                                         </connections>
@@ -38,7 +30,7 @@
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="pam-zo-sIX"/>
                                     <barButtonItem style="plain" id="jqu-R3-BhP">
                                         <button key="customView" opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="BAl-Mc-qa9">
-                                            <rect key="frame" x="220" y="7" width="98" height="30"/>
+                                            <rect key="frame" x="191" y="7" width="98" height="30"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <state key="normal" title="Album"/>
                                             <connections>

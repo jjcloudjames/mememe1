@@ -27,9 +27,9 @@ UINavigationControllerDelegate, UITextFieldDelegate {
 
     //Add outlets to control visability
 
-    
-    @IBOutlet weak var shareButton: UIBarButtonItem!
     //share button to capture memed image with text
+    @IBOutlet weak var shareButton: UIBarButtonItem!
+    
 
     struct Meme {
         var topText: String
@@ -130,7 +130,6 @@ UINavigationControllerDelegate, UITextFieldDelegate {
         //self.view.drawViewHierarchyInRect(self.view.frame, afterScreenUpdates: true)
         let memedImage : UIImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
- 
         
         return memedImage
     }
@@ -144,27 +143,27 @@ UINavigationControllerDelegate, UITextFieldDelegate {
     
      // button press for photo or camera, added message note for inoperable camera
     @IBAction func pickAnimage(_ sender: UIBarButtonItem) {
-        let device = ("camera")
-        let cameraTag = 0
-        if (sender.tag == cameraTag) {
-            noCamera(optDev: device)
-            //configureImagePicker(Type: .camera)
+
+        if (sender.tag == 0) {
+            configureImagePicker(Type: .camera)
         }
         else {
             configureImagePicker(Type: .photoLibrary)
         }
+       
 
     }
     
     //define source
     func configureImagePicker(Type: UIImagePickerControllerSourceType){
         let imagePicker = UIImagePickerController()
-        imagePicker.sourceType = Type
+        //imagePicker.sourceType = Type
+
         imagePicker.delegate = self
         
         present(imagePicker, animated: true, completion: nil)
         self.shareButton.isEnabled = true
-        self.toolbarBottom.isHidden = true
+        self.toolbarBottom.isHidden = false
     }
     
     
